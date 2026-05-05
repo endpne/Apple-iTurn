@@ -17,7 +17,7 @@ jobs:
       - name: 🛠️ Checkout repository
         uses: actions/checkout@v4
         with:
-            repository: saltpi/iPlay.Apple
+            repository: saltpi/iTurn
             ref: 'develop'
             token: ${{ secrets.REPO_TOKEN }}
             submodules: recursive
@@ -33,24 +33,16 @@ jobs:
       - name: 📄 Download provisioning profiles
         uses: apple-actions/download-provisioning-profiles@v4
         with:
-          bundle-id: top.ourfor.app.iPlayClient
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-
-      - name: 📄 Download provisioning profiles
-        uses: apple-actions/download-provisioning-profiles@v4
-        with:
-          bundle-id: top.ourfor.app.iPlayClient.Safari
+          bundle-id: cn.saltpi.app.iTurn
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
 
       - name: 🔢 Update Build Number
         id: update_build_number
-        uses: saltpi/update-testflight-build-number@v5
+        uses: saltpi/update-testflight-build-number@v6
         with:
-          app-id: '6480576133'
+          app-id: '6763750412'
           platform: 'MAC_OS'
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
@@ -59,7 +51,14 @@ jobs:
       - name: 🧾 Print Build Number
         run: |
           echo "Build Number: ${{ steps.update_build_number.outputs.build-number }}"
-          cat iPlay.xcodeproj/project.pbxproj | grep -A 1 'CURRENT_PROJECT_VERSION = '
+          cat iTurn.xcodeproj/project.pbxproj | grep -A 1 'CURRENT_PROJECT_VERSION = '
+
+      - name: 🧱 Install dependencies
+        run: |
+          brew install xcodegen
+          brew install xcbeautify
+          xcodegen
+        working-directory: iTurn
 
       - name: ⏰ SPM cache
         uses: actions/cache@v4
@@ -72,7 +71,6 @@ jobs:
       - name: 🚀 Build app
         shell: bash
         run: |
-          git apply script/macos/*.patch --allow-empty
           next_build_number=$((${{ steps.update_build_number.outputs.build-number }} + 1))
           export BUILD_NUMBER=$next_build_number
           ./script/build_macos.sh
@@ -81,7 +79,7 @@ jobs:
       - name: ☁️ Upload to TestFlight
         uses: apple-actions/upload-testflight-build@v3
         with:
-          app-path: .build/Artifacts/iPlay.pkg
+          app-path: .build/Artifacts/iTurn.pkg
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
@@ -92,24 +90,24 @@ jobs:
       #     buildtime=$(date '+%Y%m%d.%H%M')
       #     wget https://drive.ourfor.top/tools/upload_session.py -O upload.py
       #     python -m pip install requests tqdm
-      #     python upload.py --url "https://drive.ourfor.top/od_bot/build/iPlay/macOS/iPlay_build_${version_code}.pkg" \
-      #       --file "$PWD/.build/Artifacts/iPlay.pkg" \
+      #     python upload.py --url "https://drive.ourfor.top/od_bot/build/iTurn/macOS/iTurn_build_${version_code}.pkg" \
+      #       --file "$PWD/.build/Artifacts/iTurn.pkg" \
       #       --token "${{ secrets.ONEDRIVE_CLIENT_ID }}"
-      #     python upload.py --url "https://drive.ourfor.top/od_bot/build/iPlay/macOS/iPlay_build_${version_code}.dmg" \
-      #       --file "$PWD/.build/Artifacts/iPlay.dmg" \
+      #     python upload.py --url "https://drive.ourfor.top/od_bot/build/iTurn/macOS/iTurn_build_${version_code}.dmg" \
+      #       --file "$PWD/.build/Artifacts/iTurn.dmg" \
       #       --token "${{ secrets.ONEDRIVE_CLIENT_ID }}"
-      #     echo "https://drive.ourfor.top/od_bot/build/iPlay/macOS/iPlay_build_${version_code}.dmg" > "$PWD/.build/Artifacts/latest.dmg.url"
-      #     python upload.py --url "https://drive.ourfor.top/od_bot/build/iPlay/macOS/latest.dmg.url" \
+      #     echo "https://drive.ourfor.top/od_bot/build/iTurn/macOS/iTurn_build_${version_code}.dmg" > "$PWD/.build/Artifacts/latest.dmg.url"
+      #     python upload.py --url "https://drive.ourfor.top/od_bot/build/iTurn/macOS/latest.dmg.url" \
       #       --file "$PWD/.build/Artifacts/latest.dmg.url" \
       #       --token "${{ secrets.ONEDRIVE_CLIENT_ID }}"
-      #     python upload.py --url "https://drive.ourfor.top/od_kiss/iplay/appcast.xml" \
+      #     python upload.py --url "https://drive.ourfor.top/od_kiss/iTurn/appcast.xml" \
       #       --file "$PWD/.build/Artifacts/appcast.xml" \
       #       --token "${{ secrets.ONEDRIVE_CLIENT_ID }}"
       #   shell: bash
       - name: 🏷️ Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          repository: endpne/iPlay-Release-macOS
+          repository: endpne/iTurn-Release-macOS
           token: ${{ secrets.GH_RELEASE_TOKEN }}
           tag_name: macos-build-${{ steps.update_build_number.outputs.build-number }}
           name: macOS Build ${{ steps.update_build_number.outputs.build-number }}
@@ -118,13 +116,13 @@ jobs:
             macOS TestFlight Build ${{ steps.update_build_number.outputs.build-number }}
             
             Build artifacts:
-            - iPlay.pkg (TestFlight package)
-            - iPlay.dmg (Direct installation)
+            - iTurn.pkg (TestFlight package)
+            - iTurn.dmg (Direct installation)
             
             **Installation Options:**
             1. Use the .pkg file for TestFlight distribution
             2. Use the .dmg file for direct installation
           files: |
-            .build/Artifacts/iPlay.pkg
-            .build/Artifacts/iPlay.dmg
+            .build/Artifacts/iTurn.pkg
+            .build/Artifacts/iTurn.dmg
             .build/Artifacts/appcast.xml
