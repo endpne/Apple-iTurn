@@ -43,7 +43,6 @@ jobs:
           brew install xcodegen
           brew install xcbeautify
           xcodegen
-        working-directory: iTurn
 
       - name: 🔢 Update Build Number
         id: update_build_number
@@ -84,26 +83,6 @@ jobs:
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
 
-      # - name: ☁️ Upload to Onedrive
-      #   run: |
-      #     version_code="$(git rev-list --count HEAD)"
-      #     buildtime=$(date '+%Y%m%d.%H%M')
-      #     wget https://drive.ourfor.top/tools/upload_session.py -O upload.py
-      #     python -m pip install requests tqdm
-      #     python upload.py --url "https://drive.ourfor.top/od_bot/build/iTurn/macOS/iTurn_build_${version_code}.pkg" \
-      #       --file "$PWD/.build/Artifacts/iTurn.pkg" \
-      #       --token "${{ secrets.ONEDRIVE_CLIENT_ID }}"
-      #     python upload.py --url "https://drive.ourfor.top/od_bot/build/iTurn/macOS/iTurn_build_${version_code}.dmg" \
-      #       --file "$PWD/.build/Artifacts/iTurn.dmg" \
-      #       --token "${{ secrets.ONEDRIVE_CLIENT_ID }}"
-      #     echo "https://drive.ourfor.top/od_bot/build/iTurn/macOS/iTurn_build_${version_code}.dmg" > "$PWD/.build/Artifacts/latest.dmg.url"
-      #     python upload.py --url "https://drive.ourfor.top/od_bot/build/iTurn/macOS/latest.dmg.url" \
-      #       --file "$PWD/.build/Artifacts/latest.dmg.url" \
-      #       --token "${{ secrets.ONEDRIVE_CLIENT_ID }}"
-      #     python upload.py --url "https://drive.ourfor.top/od_kiss/iTurn/appcast.xml" \
-      #       --file "$PWD/.build/Artifacts/appcast.xml" \
-      #       --token "${{ secrets.ONEDRIVE_CLIENT_ID }}"
-      #   shell: bash
       - name: 🏷️ Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:

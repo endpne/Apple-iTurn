@@ -42,7 +42,6 @@ jobs:
           brew install xcodegen
           brew install xcbeautify
           xcodegen
-        working-directory: iTurn
 
       - name: 🔢 Update Build Number
         id: update_build_number
