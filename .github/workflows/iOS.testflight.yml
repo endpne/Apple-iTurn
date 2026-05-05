@@ -37,6 +37,13 @@ jobs:
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
 
+      - name: 🧱 Install dependencies
+        run: |
+          brew install xcodegen
+          brew install xcbeautify
+          xcodegen
+        working-directory: iTurn
+
       - name: 🔢 Update Build Number
         id: update_build_number
         uses: saltpi/update-testflight-build-number@v5
@@ -51,13 +58,6 @@ jobs:
         run: |
           echo "Build Number: ${{ steps.update_build_number.outputs.build-number }}"
           cat iTurn.xcodeproj/project.pbxproj | grep -A 1 'CURRENT_PROJECT_VERSION = '
-
-      - name: 🧱 Install dependencies
-        run: |
-          brew install xcodegen
-          brew install xcbeautify
-          xcodegen
-        working-directory: iTurn
 
       - name: ⏰ SPM cache
         uses: actions/cache@v4
