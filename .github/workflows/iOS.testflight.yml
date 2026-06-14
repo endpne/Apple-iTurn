@@ -19,6 +19,7 @@ jobs:
         with:
             repository: saltpi/iTurn
             ref: 'develop'
+            fetch-depth: 0
             token: ${{ secrets.REPO_TOKEN }}
             submodules: recursive
 
@@ -69,7 +70,8 @@ jobs:
       - name: 🚀 Build app
         shell: bash
         run: |
-          next_build_number=$((${{ steps.update_build_number.outputs.build-number }} + 1))
+          # next_build_number=$((${{ steps.update_build_number.outputs.build-number }} + 1))
+          next_build_number=$(git rev-list --count HEAD)
           export BUILD_NUMBER=$next_build_number
           ./script/build_ios.sh
 
